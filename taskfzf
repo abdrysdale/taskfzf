@@ -67,6 +67,14 @@ if [ -n "$_TASKFZF_TASK_ACT" ]; then
 		tasks_args=$(grep -o '[0-9a-f]\{8\}' $@ | tr '\n' ' ')
 	else
 		tasks_args=$(awk '{printf $1" "} END {printf "\n"}' $@)
+		task_url=`awk -e '$1 ~ /[0-9]+[-/][0-9]+[-/][0-9]+/ {print $2}' $@`
+		if [ -n $task_url ]; then
+			if [ -n $DISPLAY ]; then
+				x-www-browser "$task_url" &
+			else
+				www-browser "$task_url"
+			fi
+		fi
 	fi
 	case "$tasks_args" in
 		^[a-f0-9])
