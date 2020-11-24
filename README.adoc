@@ -3,6 +3,7 @@ Modifications include:
 
 1. Fixing the undo command
 2. Default to add project (rather than just add)
+3. Run a web browser on hyperlinks into annotation 
 
 The original README is below.
 
