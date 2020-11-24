@@ -68,10 +68,8 @@ if [ -n "$_TASKFZF_TASK_ACT" ]; then
 	else
 		tasks_args=$(awk '{printf $1" "} END {printf "\n"}' $@)
 		task_url=`awk -e '$1 ~ /[0-9]+[-/][0-9]+[-/][0-9]+/ {print $2}' $@`
-		echo $task_url >/tmp/DEBUG
 		if [ -n $task_url ]; then
 			if [ -n $DISPLAY ]; then
-				echo $task_url >>/tmp/DEBUG
 				x-www-browser "$task_url" &
 			else
 				www-browser "$task_url"
