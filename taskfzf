@@ -67,13 +67,23 @@ if [ -n "$_TASKFZF_TASK_ACT" ]; then
 		tasks_args=$(grep -o '[0-9a-f]\{8\}' $@ | tr '\n' ' ')
 	else
 		tasks_args=$(awk '{printf $1" "} END {printf "\n"}' $@)
-		task_url=`awk -e '$1 ~ /[0-9]+[-/][0-9]+[-/][0-9]+/ {print $2}' $@`
+		task_url=$(awk -e '$1 ~ /[0-9]+[-/][0-9]+[-/][0-9]+/ && $2 ~ /^http/ {print $2}' $@)
 		if [ -n "$task_url" -a "$_TASKFZF_TASK_ACT" = "information" ]; then
 			if [ -n "$DISPLAY" ]; then
-				x-www-browser "$task_url" &
+				for url in $task_url 
+					do x-www-browser $url &
+				done
 			else
-				www-browser "$task_url"
+				echo "Sorry! does not realised yet!" 
+				read
+				#for url in $task_url ; do
+					#lynx $url
+				#done
 			fi
+		fi
+		task_messageid=$(awk -e '$1 ~ /[0-9]+[-/][0-9]+[-/][0-9]+/ && $2 ~ /^Message-ID:/ {print $3}' $@)
+		if [ -n "$task_messageid" -a "$_TASKFZF_TASK_ACT" = "information" ]; then
+			open-mutt-on-message-id "$task_url"
 		fi
 	fi
 	case "$tasks_args" in
@@ -122,12 +132,15 @@ if [ -n "$_TASKFZF_TASK_ACT" ]; then
 			task $tasks_args "$_TASKFZF_TASK_ACT"
 			;;
 	esac
-	# Prints a banner for after action view - it's a dirty and dumb version of
-	# piping to less.
-	echo ---------------------------------------------------------------------------
-	echo End of \`task "$_TASKFZF_TASK_ACT"\` output. Press any key to continue
-	read
-	exit $?
+	if [ ! -n "$task_url" ] ; then 
+		# Prints a banner for after action view - it's a dirty and dumb version of
+		# piping to less.
+		echo ---------------------------------------------------------------------------
+		echo End of \`task "$_TASKFZF_TASK_ACT"\` output. Press any key to continue
+		unset task_url
+		read
+		exit $?
+	fi
 fi
 
 if [ -n "$_TASKFZF_LIST_CHANGE" ]; then
